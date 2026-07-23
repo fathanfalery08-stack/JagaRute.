@@ -271,7 +271,7 @@ input,select{ font-family:inherit; }
 
 /* ---------- STAT WIDGET ---------- */
 #statWidget{
-  bottom:.9rem; left:.9rem; width:min(280px, calc(100% - 1.8rem));
+  top:.9rem; right:.9rem; width:min(280px, calc(100% - 1.8rem));
   padding:.9rem;
 }
 .stat-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:.5rem; }
@@ -446,6 +446,18 @@ input,select{ font-family:inherit; }
 .modal-box h3{ font-family:var(--font-display); font-size:1.6rem; margin:.2rem 0 .6rem; }
 .modal-box .hint{ font-size:.82rem; color:var(--ink-soft); }
 .modal-close{ position:absolute; top:1rem; right:1rem; min-width:36px; min-height:36px; border:none; background:var(--asphalt); color:var(--white); border-radius:8px; font-size:.95rem; display:flex; align-items:center; justify-content:center; }
+.login-error{
+  display:flex; align-items:center; gap:.4rem; margin-top:.6rem; padding:.55rem .7rem;
+  background:rgba(228,87,75,.12); border:1px solid var(--status-belum); color:var(--status-belum);
+  border-radius:var(--radius-sm); font-size:.82rem; font-weight:700;
+}
+#adminPass.input-error{ border-color:var(--status-belum) !important; animation:shake-error .32s ease-in-out; }
+@keyframes shake-error{
+  10%,90%{ transform:translateX(-1px); }
+  20%,80%{ transform:translateX(2px); }
+  30%,50%,70%{ transform:translateX(-4px); }
+  40%,60%{ transform:translateX(4px); }
+}
 #adminPass{ width:100%; min-height:46px; border:2px solid var(--concrete-dark); border-radius:var(--radius-sm); padding:0 .8rem; font-size:1rem; background:var(--surface); color:var(--ink); }
 
 /* ---------- PICK MODE BANNER ---------- */
@@ -511,7 +523,7 @@ input,select{ font-family:inherit; }
   .page{ padding:1.1rem .8rem 2.5rem; }
   .map-card{ height:70vh; }
   #filterPanel{ width:calc(100% - 1.6rem); }
-  #statWidget{ left:.8rem; right:.8rem; width:auto; }
+  #statWidget{ top:auto; bottom:.8rem; left:.8rem; right:.8rem; width:auto; }
   #sidePanel{ width:100vw; top:auto; height:85vh; border-radius:20px 20px 0 0; transform:translateY(105%); }
   #sidePanel.open{ transform:translateY(0); }
   #adminPanel{ width:100vw; top:auto; height:85vh; border-radius:20px 20px 0 0; transform:translateY(-105%); }
@@ -765,7 +777,7 @@ input,select{ font-family:inherit; }
 .ad-stat-card .asc-pct{ font-size:.76rem; color:var(--ad-text-soft); }
 .ad-stat-card .asc-pct b{ color:var(--ad-text); }
 
-.ad-grid{ display:grid; grid-template-columns:2fr 1fr; gap:1rem; align-items:start; margin-bottom:1.3rem; }
+.ad-grid{ display:grid; grid-template-columns:2fr 1fr; gap:1rem; align-items:stretch; margin-bottom:1.3rem; }
 .ad-panel-box{
   background:var(--ad-panel); border:1px solid var(--ad-border); border-radius:var(--radius-md); padding:1.1rem;
 }
@@ -776,7 +788,10 @@ input,select{ font-family:inherit; }
   border-radius:var(--radius-sm); padding:.35rem .6rem; font-size:.76rem; font-weight:600;
 }
 
+.ad-map-wrap{ display:flex; flex-direction:column; }
 .ad-map-wrap .map-card{ height:420px; border-color:var(--ad-border); }
+.ad-map-wrap #adDashboardMapSlot{ flex:1; display:flex; }
+.ad-map-wrap #adDashboardMapSlot .map-card{ flex:1; height:auto; min-height:420px; }
 .ad-map-wrap.full .map-card{ height:min(74vh, 640px); }
 .map-card--full{ height:min(74vh, 640px) !important; }
 .ad-map-wrap .fab-link{
@@ -846,6 +861,64 @@ input,select{ font-family:inherit; }
 @media (max-width:960px){
   .ad-sidebar{ display:none; }
   .ad-grid{ grid-template-columns:1fr; }
+}
+
+/* ---------- SIDEBAR RINGKASAN CEPAT (mode warga, kiri) ---------- */
+.warga-sidebar{
+  position:fixed; left:0; top:50%; transform:translateY(-50%); z-index:950;
+  display:flex; align-items:flex-start;
+}
+.ws-rail{
+  display:flex; flex-direction:column; gap:.5rem;
+  background:var(--chrome-surface); border:2px solid var(--chrome-border); border-left:none;
+  border-radius:0 var(--radius-lg) var(--radius-lg) 0; padding:.7rem .55rem; box-shadow:var(--shadow-1);
+}
+.ws-rail-icon{
+  width:2.3rem; height:2.3rem; border-radius:var(--radius-sm); display:flex; align-items:center; justify-content:center;
+  color:var(--chrome-text-soft); background:var(--chrome-surface-2); transition:background .15s, color .15s;
+}
+.ws-rail:hover .ws-rail-icon, .ws-rail[aria-expanded="true"] .ws-rail-icon{ color:var(--asphalt); background:var(--signal-yellow); }
+
+.ws-panel{
+  width:0; overflow:hidden; background:var(--surface); border-radius:0 var(--radius-lg) var(--radius-lg) 0;
+  box-shadow:var(--shadow-2); transition:width .28s ease; max-height:min(70vh, 560px); display:flex; flex-direction:column;
+}
+.ws-panel.open{ width:min(300px, calc(100vw - 5rem)); border:2px solid var(--concrete-dark); border-left:none; }
+
+.ws-view{ display:none; flex-direction:column; padding:.9rem; overflow-y:auto; }
+.ws-view.active{ display:flex; }
+
+.ws-panel-head{ display:flex; align-items:center; gap:.5rem; margin-bottom:.7rem; flex:none; }
+.ws-panel-head h3{ margin:0; flex:1; font-family:var(--font-display); font-size:1.1rem; font-weight:700; color:var(--ink); }
+.ws-panel-head button{ min-width:30px; min-height:30px; border:none; background:var(--concrete); color:var(--ink); border-radius:8px; font-weight:800; flex:none; }
+
+.ws-menu-item{
+  display:flex; align-items:center; gap:.7rem; width:100%; min-height:56px; padding:.5rem .6rem;
+  border:2px solid var(--concrete-dark); border-radius:var(--radius-md); background:var(--surface); margin-bottom:.6rem; text-align:left;
+}
+.ws-menu-item:last-child{ margin-bottom:0; }
+.ws-menu-item:hover{ border-color:var(--gov-blue); }
+.wmi-icon{
+  width:2.2rem; height:2.2rem; border-radius:var(--radius-sm); flex:none; display:flex; align-items:center; justify-content:center; color:#fff;
+}
+.wmi-text{ display:flex; flex-direction:column; flex:1; min-width:0; color:var(--ink); }
+.wmi-text strong{ font-size:.86rem; }
+.wmi-sub{ font-size:.72rem; color:var(--ink-soft); }
+.wmi-count{ font-family:var(--font-mono); font-weight:700; font-size:1rem; flex:none; color:var(--ink); }
+
+.ws-list-body{ display:flex; flex-direction:column; gap:.6rem; }
+.ws-list-item{
+  border:2px solid var(--concrete-dark); border-radius:var(--radius-md); padding:.7rem; text-align:left; background:var(--surface);
+}
+.ws-list-item:hover{ border-color:var(--gov-blue); }
+.wli-head{ display:flex; justify-content:space-between; align-items:flex-start; gap:.5rem; }
+.wli-jalan{ font-weight:700; font-size:.9rem; color:var(--ink); }
+.wli-meta{ font-size:.76rem; color:var(--ink-soft); margin-top:.25rem; }
+
+.ws-overlay{ position:fixed; inset:0; z-index:940; background:rgba(0,0,0,.25); }
+
+@media (max-width:720px){
+  .ws-panel.open{ width:min(260px, calc(100vw - 4.4rem)); }
 }
 </style>
 </head>
@@ -1052,6 +1125,61 @@ input,select{ font-family:inherit; }
 
 <div id="app" hidden>
 
+<nav id="wargaSidebar" class="warga-sidebar">
+  <button type="button" id="wsRailToggle" class="ws-rail" aria-expanded="false" aria-label="Buka ringkasan cepat">
+    <span class="ws-rail-icon" data-icon="clipboard"></span>
+    <span class="ws-rail-icon" data-icon="alarmClock"></span>
+    <span class="ws-rail-icon" data-icon="wrench"></span>
+    <span class="ws-rail-icon" data-icon="checkCircle"></span>
+    <span class="ws-rail-icon" data-icon="alertTriangle"></span>
+  </button>
+
+  <div class="ws-panel" id="wsPanel" aria-hidden="true">
+    <div class="ws-view ws-view-menu active" id="wsViewMenu">
+      <div class="ws-panel-head">
+        <h3>Ringkasan Cepat</h3>
+        <button type="button" id="wsPanelClose" aria-label="Tutup ringkasan">✕</button>
+      </div>
+      <button type="button" class="ws-menu-item" data-cat="total">
+        <span class="wmi-icon" style="background:#3A3D44"><span data-icon="clipboard"></span></span>
+        <span class="wmi-text"><strong>Total Laporan</strong><span class="wmi-sub">Semua laporan warga</span></span>
+        <span class="wmi-count" id="wsCount-total">0</span>
+      </button>
+      <button type="button" class="ws-menu-item" data-cat="belum">
+        <span class="wmi-icon" style="background:#5A2323"><span data-icon="alarmClock"></span></span>
+        <span class="wmi-text"><strong>Belum Ditangani</strong><span class="wmi-sub">Menunggu tindakan</span></span>
+        <span class="wmi-count" id="wsCount-belum">0</span>
+      </button>
+      <button type="button" class="ws-menu-item" data-cat="penanganan">
+        <span class="wmi-icon" style="background:#5A4419"><span data-icon="wrench"></span></span>
+        <span class="wmi-text"><strong>Dalam Penanganan</strong><span class="wmi-sub">Ditinjau &amp; diperbaiki</span></span>
+        <span class="wmi-count" id="wsCount-penanganan">0</span>
+      </button>
+      <button type="button" class="ws-menu-item" data-cat="selesai">
+        <span class="wmi-icon" style="background:#1F4A2E"><span data-icon="checkCircle"></span></span>
+        <span class="wmi-text"><strong>Selesai</strong><span class="wmi-sub">Sudah diperbaiki</span></span>
+        <span class="wmi-count" id="wsCount-selesai">0</span>
+      </button>
+      <button type="button" class="ws-menu-item" data-cat="urgent">
+        <span class="wmi-icon" style="background:#3A2560"><span data-icon="alertTriangle"></span></span>
+        <span class="wmi-text"><strong>Perlu Segera</strong><span class="wmi-sub">Butuh perhatian cepat</span></span>
+        <span class="wmi-count" id="wsCount-urgent">0</span>
+      </button>
+    </div>
+
+    <div class="ws-view ws-view-list" id="wsViewList">
+      <div class="ws-panel-head">
+        <button type="button" id="wsListBack" aria-label="Kembali ke menu">‹</button>
+        <h3 id="wsListTitle">Daftar</h3>
+        <button type="button" id="wsPanelClose2" aria-label="Tutup ringkasan">✕</button>
+      </div>
+      <div class="ws-list-body" id="wsListBody"></div>
+    </div>
+  </div>
+</nav>
+<div id="wsOverlay" class="ws-overlay" hidden></div>
+
+
   <header id="topbar">
     <div class="brand" id="topbarBrand" style="cursor:pointer;" title="Kembali ke beranda">
       <svg class="brand-mark" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -1210,6 +1338,10 @@ input,select{ font-family:inherit; }
               <div class="ad-panel-head"><h3>Kerusakan Berdasarkan Jenis</h3></div>
               <div id="adTypeDonut"></div>
             </div>
+            <div class="ad-panel-box">
+              <div class="ad-panel-head"><h3>Ringkasan</h3></div>
+              <div id="adRingkasanTable"></div>
+            </div>
           </div>
         </div>
         <div class="ad-panel-box">
@@ -1323,6 +1455,7 @@ input,select{ font-family:inherit; }
     <p class="hint" style="margin-bottom:1rem;">Untuk tim teknis memverifikasi laporan dan memperbarui status penanganan.</p>
     <label for="adminPass" style="display:block;font-weight:700;font-size:.85rem;margin-bottom:.4rem;">Kode Akses</label>
     <input id="adminPass" type="password" placeholder="Masukkan kode akses">
+    <div id="loginError" class="login-error" hidden><span data-icon="alertTriangle" data-icon-size="15"></span> Kode akses salah. Coba lagi.</div>
     <button id="loginSubmitBtn" class="btn-submit" style="border-radius:var(--radius-sm);margin-top:1rem;">Masuk</button>
   </div>
 </div>
@@ -2146,17 +2279,27 @@ document.getElementById('adminModeBtn').addEventListener('click', ()=>{
   } else {
     loginModal.hidden = false;
     document.getElementById('adminPass').value = '';
+    document.getElementById('adminPass').classList.remove('input-error');
+    document.getElementById('loginError').hidden = true;
     document.getElementById('adminPass').focus();
   }
 });
 document.getElementById('closeLoginModal').addEventListener('click', ()=> loginModal.hidden = true);
 document.getElementById('loginSubmitBtn').addEventListener('click', doLogin);
 document.getElementById('adminPass').addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
+document.getElementById('adminPass').addEventListener('input', ()=>{
+  document.getElementById('loginError').hidden = true;
+  document.getElementById('adminPass').classList.remove('input-error');
+});
 
 function doLogin(){
-  const val = document.getElementById('adminPass').value.trim();
+  const passInput = document.getElementById('adminPass');
+  const loginError = document.getElementById('loginError');
+  const val = passInput.value.trim();
   if(val === ADMIN_PASSCODE){
     isAdmin = true;
+    loginError.hidden = true;
+    passInput.classList.remove('input-error');
     loginModal.hidden = true;
     roleGate.hidden = true;
     appRoot.hidden = true;
@@ -2167,7 +2310,13 @@ function doLogin(){
     refreshAdminDashboard();
     showToast('Berhasil masuk sebagai admin.');
   } else {
-    showToast('Kode akses salah.', 'error');
+    // Notifikasi langsung di dalam modal (toast di belakang overlay modal tidak akan terlihat)
+    loginError.hidden = false;
+    passInput.classList.remove('input-error');
+    void passInput.offsetWidth; // reset animasi shake supaya bisa diulang tiap kali salah
+    passInput.classList.add('input-error');
+    passInput.select();
+    passInput.focus();
   }
 }
 
@@ -2254,6 +2403,7 @@ function refreshAdminDashboard(){
   renderAdStatsRow();
   renderAdLineChart('adLineChart');
   renderAdTypeDonut('adTypeDonut');
+  renderAdRingkasanTable('adRingkasanTable');
   renderAdCarousel();
   const activeTab = document.querySelector('.ad-nav-btn.active')?.dataset.tab;
   if(activeTab === 'laporan') renderAdminList();
@@ -2361,6 +2511,31 @@ function renderAdTypeDonut(targetId){
         `).join('')}
       </ul>
     </div>
+  `;
+}
+
+function renderAdRingkasanTable(targetId){
+  const counts = { belum:0, tinjauan:0, proses:0, selesai:0 };
+  reports.forEach(r=> counts[r.status]++);
+  const total = reports.length || 1;
+  const rows = STATUS_ORDER.map(st=>{
+    const meta = STATUS_META[st];
+    const val = counts[st];
+    const pct = Math.round(val/total*100);
+    return `<tr>
+      <td><span class="dot" style="display:inline-block;width:.65rem;height:.65rem;border-radius:50%;background:${meta.hex};margin-right:.45rem;vertical-align:middle;"></span>${meta.label}</td>
+      <td>${val}</td>
+      <td>${pct}%</td>
+    </tr>`;
+  }).join('');
+  document.getElementById(targetId).innerHTML = `
+    <table class="ad-table">
+      <thead><tr><th>Status</th><th>Jumlah</th><th>%</th></tr></thead>
+      <tbody>
+        ${rows}
+        <tr style="font-weight:800;"><td>Total Laporan</td><td>${reports.length}</td><td>100%</td></tr>
+      </tbody>
+    </table>
   `;
 }
 
@@ -2976,6 +3151,102 @@ async function sendAiMessage(presetText){
 /* =========================================================
    INIT
 ========================================================= */
+/* =========================================================
+   SIDEBAR RINGKASAN CEPAT (mode warga, kiri)
+   Ditambahkan sebagai modul terpisah — tidak mengubah fungsi
+   atau markup yang sudah ada. Cukup "menumpang" pada fungsi
+   updateStats() yang sudah jalan tiap data berubah, supaya
+   angka & daftar di sidebar ini ikut ter-update otomatis.
+========================================================= */
+(function initWargaSidebar(){
+  const rail = document.getElementById('wsRailToggle');
+  const panel = document.getElementById('wsPanel');
+  const overlay = document.getElementById('wsOverlay');
+  const viewMenu = document.getElementById('wsViewMenu');
+  const viewList = document.getElementById('wsViewList');
+  const listTitle = document.getElementById('wsListTitle');
+  const listBody = document.getElementById('wsListBody');
+  if(!rail || !panel) return;
+
+  const WS_CATS = {
+    total:      { label:'Total Laporan',    filter: ()=> true },
+    belum:      { label:'Belum Ditangani',  filter: r => r.status === 'belum' },
+    penanganan: { label:'Dalam Penanganan', filter: r => r.status === 'tinjauan' || r.status === 'proses' },
+    selesai:    { label:'Selesai',          filter: r => r.status === 'selesai' },
+    urgent:     { label:'Perlu Segera',     filter: r => isUrgent(r) },
+  };
+
+  function wsOpen(){
+    panel.classList.add('open');
+    panel.setAttribute('aria-hidden','false');
+    rail.setAttribute('aria-expanded','true');
+    overlay.hidden = false;
+  }
+  function wsClose(){
+    panel.classList.remove('open');
+    panel.setAttribute('aria-hidden','true');
+    rail.setAttribute('aria-expanded','false');
+    overlay.hidden = true;
+    wsShowMenu();
+  }
+  function wsShowMenu(){
+    viewMenu.classList.add('active');
+    viewList.classList.remove('active');
+  }
+  function wsShowList(cat){
+    const def = WS_CATS[cat];
+    if(!def) return;
+    listTitle.textContent = def.label;
+    const matched = reports.filter(def.filter).sort((a,b)=> b.createdAt - a.createdAt);
+    listBody.innerHTML = matched.length ? matched.map(r=>`
+      <button type="button" class="ws-list-item" data-id="${r.id}">
+        <div class="wli-head">
+          <div class="wli-jalan">${escapeHtml(r.namaJalan)}</div>
+          <span class="status-pill" style="background:${STATUS_META[r.status].hex};font-size:.66rem;">${STATUS_META[r.status].label}</span>
+        </div>
+        <div class="wli-meta">${escapeHtml(r.jenisKerusakan)} · ${LEVEL_META[r.level].label} · ${daysSince(r.createdAt)} hari lalu</div>
+      </button>
+    `).join('') : `
+      <div class="empty-state">
+        <div class="es-title">Belum ada laporan</div>
+        <div>Kategori ini belum memiliki data saat ini.</div>
+      </div>
+    `;
+    listBody.querySelectorAll('.ws-list-item').forEach(el=>{
+      el.addEventListener('click', ()=>{ wsClose(); openDetail(el.dataset.id); });
+    });
+    viewMenu.classList.remove('active');
+    viewList.classList.add('active');
+  }
+  function wsUpdateCounts(){
+    Object.keys(WS_CATS).forEach(cat=>{
+      const el = document.getElementById('wsCount-' + cat);
+      if(el) el.textContent = reports.filter(WS_CATS[cat].filter).length;
+    });
+  }
+
+  rail.addEventListener('click', ()=>{
+    if(panel.classList.contains('open')) wsClose();
+    else { wsOpen(); wsUpdateCounts(); }
+  });
+  document.getElementById('wsPanelClose').addEventListener('click', wsClose);
+  document.getElementById('wsPanelClose2').addEventListener('click', wsClose);
+  document.getElementById('wsListBack').addEventListener('click', wsShowMenu);
+  overlay.addEventListener('click', wsClose);
+  document.querySelectorAll('.ws-menu-item').forEach(btn=>{
+    btn.addEventListener('click', ()=> wsShowList(btn.dataset.cat));
+  });
+
+  // "Numpang" di updateStats() (dipanggil tiap snapshot Firestore berubah)
+  // supaya angka ringkasan di sidebar selalu sinkron dengan data terbaru,
+  // tanpa perlu mengubah fungsi updateStats() itu sendiri.
+  const _origUpdateStats = updateStats;
+  updateStats = function(){
+    _origUpdateStats();
+    wsUpdateCounts();
+  };
+})();
+
 startRealtimeSync();
 </script>
 </body>
